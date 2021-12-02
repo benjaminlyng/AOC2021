@@ -7,6 +7,7 @@ authors = ["Benjamin Lyng Jørgensen <benjamin@lyng.space>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 more-itertools = "^8.12.0"
+pre-commit = "^2.16.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
