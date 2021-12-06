@@ -8,6 +8,8 @@ authors = ["Benjamin Lyng Jørgensen <benjamin@lyng.space>"]
 python = "^3.9"
 more-itertools = "^8.12.0"
 pre-commit = "^2.16.0"
+httpx = "^0.21.1"
+redis = "^4.0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
