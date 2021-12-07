@@ -2,7 +2,7 @@ import redis
 from more_itertools import pairwise
 from redisgraph import Node, Edge, Graph
 
-with open("inputs/day4.txt") as f:
+with open("inputs/day4-test.txt") as f:
     input_text = f.readlines()
 draws, *boards = input_text
 
@@ -22,7 +22,7 @@ def insert_board(board):
     nodes = board.copy()
     for row in nodes:
         for i, number in enumerate(row):
-            row[i] = Node(label="number", properties={"value": int(number)})
+            row[i] = Node(label="number", properties={"value": int(number), "marked":"False"})
             redis_graph.add_node(row[i])
     for row in nodes:
         for a, b in pairwise(row):
@@ -45,13 +45,27 @@ for n in draws.split(","):
         """
     redis_graph.query(q)
     q = f"""
-        unwind ['vertical', 'horizontal'] as direction
-        MATCH (o1:number) -[:directions] -(o2:number) -[:directions]-(o3:number) -[:directions]-(o4:number) -[:directions] -(o5:number) 
-        
-        return o1
+        MATCH (a1) -[:horizontal] ->(a2) -[:horizontal]->(a3) -[:horizontal]->(a4) -[:horizontal] ->(a5)
+        where a1.marked=True and a2.marked=True and a3.marked=True and a4.marked=True and a5.marked=True 
+        RETURN id(a1) as id
+        UNION all
+        MATCH (o1) -[:vertical] ->(o2) -[:vertical]->(o3) -[:vertical]->(o4) -[:vertical] ->(o5)
+        where o1.marked=True and o2.marked=True and o3.marked=True and o4.marked=True and o5.marked=True 
+        RETURN id(o1) as id
         """
     result = redis_graph.query(q)
     if result.result_set:
-        print(result.result_set)
+        q = """
+            MATCH (o) - [*] - (n)
+            where id(o)=$result
+            with distinct(n) as n
+            MATCH (o)
+            where  n.marked<>True
+            with distinct(n) as n
+            return sum(n.value)
+            """
+        result = redis_graph.query(q, {"result":int(result.result_set[0][0])})
+        print(result.result_set[0][0]*int(n))
+        break
 
     
