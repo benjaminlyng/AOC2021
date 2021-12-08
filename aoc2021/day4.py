@@ -2,7 +2,7 @@ import redis
 from more_itertools import pairwise
 from redisgraph import Node, Edge, Graph
 
-with open("inputs/day4-test.txt") as f:
+with open("inputs/day4.txt") as f:
     input_text = f.readlines()
 draws, *boards = input_text
 
@@ -14,7 +14,7 @@ try:
 except:
     pass
 all_boards = []
-for i in range(1, int(len(boards) / 6), 6):
+for i in range(1, int(len(boards) ), 6):
     all_boards.append([board.split() for board in boards[i : i + 5]])
 
 
@@ -54,6 +54,9 @@ for n in draws.split(","):
         RETURN id(o1) as id
         """
     result = redis_graph.query(q)
+    if n == '24':
+        print(result.result_set)
+
     if result.result_set:
         q = """
             MATCH (o) - [*] - (n)
